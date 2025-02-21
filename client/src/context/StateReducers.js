@@ -17,7 +17,7 @@ const reducer = (state, action) => {
         case reducerCases.SET_NEW_USER: // check if the action type is SET_NEW_USER
             return {
                 ...state, // return a new object with the state
-                userInfo: action.newUser, // set the userInfo property to the action payload
+                newUser: action.newUser, // set the userInfo property to the action payload
             };
         default: // default case that returns the state
             return state; // return the state
