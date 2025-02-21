@@ -3,22 +3,40 @@ import React from "react";
 import { FcGoogle } from "react-icons/fc";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 import { firebaseAuth } from "@/utils/FirebaseConfig";
-import { CHECK_USER } from "@/utils/ApiRoutes";
+import { CHECK_USER_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useStateProvider } from "@/context/StateContext";
+import { reducerCases } from "@/context/constants";
 
 function login() {
-  const router = useRouter();
+  const router = useRouter(); // get the router object from the useRouter hook
+
+  const [{}, dispatch] = useStateProvider(); // get the state and dispatch from the useStateProvider hook
+
   const handleLogin = async () => {
-    const provider = new GoogleAuthProvider();
+    const provider = new GoogleAuthProvider(); // create a new GoogleAuthProvider object
     const {
       user: { displayName: name, email, photoURL: profileImage },
-    } = await signInWithPopup(firebaseAuth, provider);
+    } = await signInWithPopup(firebaseAuth, provider); // sign in with Google and get the user's name, email, and profile image
     try {
-      if (email) {
-        const { data } = await axios.post(CHECK_USER, { email });
-        console.log(data);
+      if (email) { // check if the email exists
+        const { data } = await axios.post(CHECK_USER_ROUTE, { email }); // send a POST request to the CHECK_USER endpoint with the user's email
+
         if (!data.status) {
+          dispatch({
+            type: reducerCases.SET_NEW_USER,
+            newUser: true,
+          });
+          dispatch({
+            type: reducerCases.SET_USER_INFO,
+            userInfo: {
+              name,
+              email,
+              profileImage,
+              status: ""
+            },
+          })
           router.push("/onboarding");
         }
       }
