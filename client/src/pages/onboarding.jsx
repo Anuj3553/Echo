@@ -45,9 +45,9 @@ function onboarding() {
             newUser: false, // set the newUser property to true
           });
           dispatch({ // dispatch an action to set the user info
-            type: reducerCases.SET_USER_INFO, // set the action type to SET_USER_INFO
+          type: reducerCases.SET_USER_INFO, // set the action type to SET_USER_INFO
             userInfo: {
-              id: data.id, // set the id property to the user's id
+              id: data.user.id, // set the id property to the user's id
               name, // set the name property to the user's name
               email, // set the email property to the user's email
               profileImage: image, // set the profileImage property to the user's profile image

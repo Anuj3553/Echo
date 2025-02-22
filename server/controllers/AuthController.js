@@ -29,7 +29,7 @@ export const checkUser = async (req, res, next) => {
 
 export const onBoardUser = async (req, res, next) => {
     try {
-        const {email, name, about, image: profilePicture} = req.body; // Get the email, name, about, and profilePicture from the request body
+        const { email, name, about, image: profilePicture } = req.body; // Get the email, name, about, and profilePicture from the request body
 
         if (!email || !name || !profilePicture) { // If the email or name is not provided
             return res.send("Email, Name and Image are required.") // Return an error response
@@ -37,7 +37,7 @@ export const onBoardUser = async (req, res, next) => {
 
         const prisma = getPrismaInstance(); // Get the PrismaClient instance
 
-        await prisma.user.create({ // Create a new user
+        const user = await prisma.user.create({ // Create a new user
             data: {
                 email, // Set the email
                 name, // Set the name
@@ -46,7 +46,7 @@ export const onBoardUser = async (req, res, next) => {
             }
         });
 
-        return res.json({ msg: "Success", status: true }) // Return a success response
+        return res.json({ msg: "Success", status: true, user }) // Return a success response
     } catch (err) {
         next(err);
     }

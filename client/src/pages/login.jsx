@@ -46,7 +46,7 @@ function login() {
           });
           router.push("/onboarding");
         } else {
-          const { id, name, email, profilePicture: profileImage, status } = data
+          const { id, name, email, profilePicture: profileImage, status } = data.data // destructure the id, name, email, profilePicture, and status from the data.data object
 
           dispatch({ // dispatch an action to set the user info
             type: reducerCases.SET_USER_INFO, // set the action type to SET_USER_INFO
