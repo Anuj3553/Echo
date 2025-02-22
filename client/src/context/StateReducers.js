@@ -4,6 +4,8 @@ import { reducerCases } from "./constants"; // import the reducerCases object fr
 export const initialState = {
     userInfo: undefined, // set the userInfo property to undefined
     newUser: false, // set the newUser property to false
+    contactsPage: false, // set the contactsPage property to false
+    currentChatUser: undefined, // set the currentChatUser property to undefined
 }
 
 // create a new function called reducer that takes in state and action as arguments
@@ -18,6 +20,16 @@ const reducer = (state, action) => {
             return {
                 ...state, // return a new object with the state
                 newUser: action.newUser, // set the userInfo property to the action payload
+            };
+        case reducerCases.SET_ALL_CONTACTS_PAGE: // check if the action type is SET_ALL_CONTACTS_PAGE
+            return {
+                ...state, // return a new object with the state
+                contactsPage: !state.contactsPage, // set the contactsPage property to the action payload
+            };
+        case reducerCases.CHANGE_CURRENT_CHAT_USER: // check if the action type is CHANGE_CURRENT_CHAT_USER
+            return {
+                ...state, // return a new object with the state
+                currentChatUser: action.user, // set the currentChatUser property to the action payload
             };
         default: // default case that returns the state
             return state; // return the state

@@ -13,7 +13,7 @@ import Chat from "./Chat/Chat";
 function Main() {
   const router = useRouter();
 
-  const [{ userInfo }, dispatch] = useStateProvider(); // useStateProvider is a custom hook that returns the state and dispatch function from the context
+  const [{ userInfo, currentChatUser }, dispatch] = useStateProvider(); // useStateProvider is a custom hook that returns the state and dispatch function from the context
   const [redirectLogin, setRedirectLogin] = useState(false);
 
   useEffect(() => {
@@ -50,10 +50,12 @@ function Main() {
   })
 
   return (
-    <div className="grid grid-cols-main h-screen w-screen max-h-screen max-h-full">
+    <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-screen">
       <ChatList />
-      {/* <Empty /> */}
-      <Chat />
+      {currentChatUser ?
+        <Chat /> :
+        <Empty />
+      }
     </div>
   );
 }
