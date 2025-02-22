@@ -43,3 +43,44 @@ export const addMessage = async (req, res, next) => {
         );
     }
 }
+
+export const getMessages = async (req, res, next) => {
+    try {
+        const prisma = getPrismaInstance(); // Get the Prisma client instance
+
+        const { from, to } = req.params; // Extract the from and to fields from the query parameters
+
+        // Find all messages between two users
+        const messages = await prisma.messages.findMany({ // Find all messages between two users
+            where: { // Filter the messages based on the sender and receiver ids
+                OR: [ // Use the OR operator to check for messages sent in both directions
+                    { senderId: parseInt(from), receiverId: parseInt(to) }, // Check for messages sent from the sender to the receiver
+                    { senderId: parseInt(to), receiverId: parseInt(from) } // Check for messages sent from the receiver to the sender
+                ]
+            },
+            orderBy: {
+                id: "asc" // Order the messages by their id in ascending order
+            },
+        });
+
+        const unreadMessages = []; // Create an array to store unread messages
+
+        messages.forEach = ((message, index) => { // Iterate over the messages array
+            if (message.messageStatus !== "read" && message.receiverId === parseInt(to)) { // Check if the message status is not read and the receiver id is the same as the current user
+                messages[index].messageStatus = "read"; // Update the message status to read
+                unreadMessages.push(message.id); // Add the message to the unreadMessages array
+            }
+        });
+
+        await prisma.messages.updateMany({ // Update the message status for all unread messages
+            where: { // Filter the messages based on their ids
+                id: { in: unreadMessages } // Check if the message id is in the unreadMessages array
+            },
+            data: { messageStatus: "read" } // Update the message status to read
+        });
+
+        res.status(200).json({ messages }); // Return the messages array in the response
+    } catch (err) {
+        next(err);
+    }
+}
