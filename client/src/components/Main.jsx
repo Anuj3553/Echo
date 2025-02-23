@@ -1,20 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ChatList from "./Chatlist/ChatList";
 import Empty from "./Empty";
 import { onAuthStateChanged } from "firebase/auth";
 import { firebaseAuth } from "@/utils/FirebaseConfig";
 import axios from "axios";
-import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE } from "@/utils/ApiRoutes";
+import { CHECK_USER_ROUTE, GET_MESSAGES_ROUTE, HOST } from "@/utils/ApiRoutes";
 import { useRouter } from "next/navigation";
 import { useStateProvider } from "@/context/StateContext";
 import { reducerCases } from "@/context/constants";
 import Chat from "./Chat/Chat";
+import { io } from "socket.io-client";
 
 function Main() {
   const router = useRouter();
 
   const [{ userInfo, currentChatUser }, dispatch] = useStateProvider(); // useStateProvider is a custom hook that returns the state and dispatch function from the context
-  const [redirectLogin, setRedirectLogin] = useState(false);
+
+  const [redirectLogin, setRedirectLogin] = useState(false); // create a state variable to store the redirectLogin state
+  const [socketEvent, setSocketEvent] = useState(false); // create a state variable to store the socketEvent state
+
+  const socket = useRef(); // create a ref to store the socket object
 
   useEffect(() => {
     if (redirectLogin) { // if redirectLogin is true, redirect to login page
@@ -48,6 +53,31 @@ function Main() {
       }
     }
   });
+
+  useEffect(() => {
+    if (userInfo) {
+      socket.current = io(HOST); // create a new socket.io client and connect to the server
+      socket.current.emit("add-user", userInfo.id); // emit : means to send a message to the server with the event name "add-user" and the user's ID as the data
+      dispatch({ // dispatch an action to set the socket
+        type: reducerCases.SET_SOCKET, // set the socket type
+        socket // set the socket
+      })
+    }
+  }, [userInfo]); // run this effect when userInfo changes
+
+  useEffect(() => {
+    if (socket.current && !socketEvent) { // if the socket is connected and the socketEvent is false
+      socket.current.on("msg-receive", (data) => { // listen for the "msg-receive" event
+        dispatch({ // dispatch an action to set the messages
+          type: reducerCases.ADD_MESSAGE, // set the action type
+          newMessage: {
+            ...data.message // set the new message
+          }
+        })
+      });
+      setSocketEvent(true); // set the socketEvent to true
+    }
+  }, [socket.current])
 
   useEffect(() => {
     const getMessages = async () => {

@@ -7,6 +7,7 @@ export const initialState = {
     contactsPage: false, // set the contactsPage property to false
     currentChatUser: undefined, // set the currentChatUser property to undefined
     messages: [], // set the messages property to an empty array
+    socket: undefined, // set the socket property to undefined
 }
 
 // create a new function called reducer that takes in state and action as arguments
@@ -36,6 +37,16 @@ const reducer = (state, action) => {
             return {
                 ...state, // return a new object with the state
                 messages: action.messages, // set the messages property to the action payload
+            };
+        case reducerCases.SET_SOCKET: // check if the action type is SET_SOCKET
+            return {
+                ...state, // return a new object with the state
+                socket: action.socket, // set the socket property to the action payload
+            };
+        case reducerCases.ADD_MESSAGE: // check if the action type is ADD_MESSAGE
+            return {
+                ...state, // return a new object with the state
+                messages: [...state.messages, action.newMessage], // add the new message to the messages array
             };
         default: // default case that returns the state
             return state; // return the state
