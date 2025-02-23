@@ -5,14 +5,16 @@ import AuthRoutes from './routes/AuthRoutes.js'; // Import the AuthRoutes file
 import MessageRoutes from './routes/MessageRoutes.js'; // Import the MessageRoutes file
 import { Server } from 'socket.io'; // Import the Server class from the socket.io library
 
-dotenv.config();
-const app = express();
+dotenv.config(); // Load environment variables from the .env file
+const app = express(); // Create a new express application
 
-app.use(cors());
-app.use(express.json());
+app.use(cors()); // Enable CORS for all requests
+app.use(express.json()); // Parse incoming requests with JSON payloads
 
-app.use('/api/auth', AuthRoutes);
-app.use("/api/messages", MessageRoutes);
+app.use('/uploads/images/', express.static('uploads/images')); // Serve the images from the uploads/images directory
+
+app.use('/api/auth', AuthRoutes); // Use the AuthRoutes file for the /api/auth route
+app.use("/api/messages", MessageRoutes); // Use the MessageRoutes file for the /api/messages route
 
 const server = app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);

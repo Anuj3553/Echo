@@ -1,6 +1,6 @@
 import { reducerCases } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
-import { ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
+import { ADD_IMAGE_MESSAGE_ROUTE, ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
 import React, { useEffect, useRef, useState } from "react";
@@ -8,14 +8,52 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { FaMicrophone } from "react-icons/fa";
 import { ImAttachment } from "react-icons/im";
 import { MdSend } from "react-icons/md";
+import PhotoPicker from "../common/PhotoPicker";
 
 function MessageBar() {
   const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider(); // Destructure userInfo and currentChatProvider from the state
 
   const [message, setMessage] = useState(""); // Create a message state variable
   const [showEmojiPicker, setShowEmojiPicker] = useState(false); // Create a showEmojiPicker state variable
+  const [grabPhoto, setGrabPhoto] = useState(false); // Create a grabPhoto state variable
 
   const emojiPicker = useRef(null); // Create a ref for the emoji picker
+
+  // Function to handle the change event of the file input
+  const photoPickerChange = async (e) => {
+    e.preventDefault(); // Prevent the default behavior of the event
+    try {
+      const file = (e.target.files[0]); // Get the file from the file input
+      const formData = new FormData(); // Create a new FormData object
+      formData.append("image", file); // Append the file to the FormData object
+      const response = await axios.post(ADD_IMAGE_MESSAGE_ROUTE, formData, { // Send a POST request to the ADD_IMAGE_MESSAGE_ROUTE with the FormData
+        headers: {
+          "Content-Type": "multipart/form-data", // Set the content type to multipart/form-data
+        },
+        params: { // Set the query parameters
+          from: userInfo?.id, // Set the from field to the current user id
+          to: currentChatUser?.id, // Set the to field to the current chat user id
+        },
+      });
+      console.log("response", response); // Log the response to the console
+      if (response.status === 201) {
+        socket.current.emit("send-msg", { // Emit a "send-msg" event to the server with the message data
+          to: currentChatUser?.id, // Send the message to the current chat user
+          from: userInfo?.id, // Send the message from the current user
+          message: response.data.message, // Send the message data
+        });
+        dispatch({
+          type: reducerCases.ADD_MESSAGE, // Add the message to the messages array
+          newMessage: {
+            ...response.data.message // Set the new message
+          },
+          fromSelf: true, // Set the fromSelf flag to true
+        })
+      }
+    } catch (err) {
+      console.error(err); // Log any errors to the console
+    }
+  }
 
   // useEffect: This hook is used to listen for clicks outside the emoji picker
   useEffect(() => {
@@ -71,6 +109,26 @@ function MessageBar() {
     }
   }
 
+  // useEffect: This hook is used to open the file input when the grabPhoto state is true
+  useEffect(() => {
+    if (grabPhoto) { // Check if the grabPhoto state is true
+      const fileInput = document.getElementById("photo-picker"); // Get the file input element
+      if (fileInput) { // Check if the file input element exists
+        fileInput.click(); // Click the file input element
+      }
+  
+      const handleFileChange = () => {
+        setTimeout(() => setGrabPhoto(false), 1000); // Delay to ensure selection
+      };
+  
+      fileInput?.addEventListener("change", handleFileChange); // Add an event listener for the "change" event
+  
+      return () => {
+        fileInput?.removeEventListener("change", handleFileChange); // Remove the event listener when the component unmounts
+      };
+    }
+  }, [grabPhoto]); // Run this effect whenever the grabPhoto state changes
+
   return (
     <div className="bg-panel-header-background h-20 px-4 flex items-center gap-6 relative">
       <>
@@ -94,7 +152,8 @@ function MessageBar() {
 
           <ImAttachment
             className="text-panel-header-icon cursor-pointer text-xl"
-            title="Attachment"
+            title="Attach File"
+            onClick={() => setGrabPhoto(true)}
           />
         </div>
         <div className="w-full rounded-lg h-10 items-center">
@@ -120,6 +179,7 @@ function MessageBar() {
           </button>
         </div>
       </>
+      {grabPhoto && <PhotoPicker onChange={photoPickerChange} />}
     </div>
   );
 }

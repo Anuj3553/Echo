@@ -22,6 +22,7 @@ function Avatar({ type, image, setImage }) {
     setIsContextMenuVisible(true); // Show the context menu
   }
 
+  // useEffect: This hook is used to open the file input when the grabPhoto state is true
   useEffect(() => {
     if (grabPhoto) { // Check if the grabPhoto state is true
       const data = document.getElementById("photo-picker"); // Get the file input element
