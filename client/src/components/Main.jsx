@@ -10,11 +10,12 @@ import { useStateProvider } from "@/context/StateContext";
 import { reducerCases } from "@/context/constants";
 import Chat from "./Chat/Chat";
 import { io } from "socket.io-client";
+import SearchMessages from "./Chat/SearchMessages";
 
 function Main() {
   const router = useRouter();
 
-  const [{ userInfo, currentChatUser }, dispatch] = useStateProvider(); // useStateProvider is a custom hook that returns the state and dispatch function from the context
+  const [{ userInfo, currentChatUser, messagesSearch }, dispatch] = useStateProvider(); // useStateProvider is a custom hook that returns the state and dispatch function from the context
 
   const [redirectLogin, setRedirectLogin] = useState(false); // create a state variable to store the redirectLogin state
   const [socketEvent, setSocketEvent] = useState(false); // create a state variable to store the socketEvent state
@@ -97,7 +98,10 @@ function Main() {
     <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-screen">
       <ChatList />
       {currentChatUser ?
-        <Chat /> :
+        <div className={messagesSearch ? "grid grid-cols-2" : "grid-cols-2"}>
+          <Chat />
+          {messagesSearch && <SearchMessages />}
+        </div> :
         <Empty />
       }
     </div>

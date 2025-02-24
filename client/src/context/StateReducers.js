@@ -8,6 +8,7 @@ export const initialState = {
     currentChatUser: undefined, // set the currentChatUser property to undefined
     messages: [], // set the messages property to an empty array
     socket: undefined, // set the socket property to undefined
+    messagesSearch: false // set the messagesSearch property to false
 }
 
 // create a new function called reducer that takes in state and action as arguments
@@ -48,6 +49,11 @@ const reducer = (state, action) => {
                 ...state, // return a new object with the state
                 messages: [...state.messages, action.newMessage], // add the new message to the messages array
             };
+        case reducerCases.SET_MESSAGE_SEARCH: // check if the action type is SET_MESSAGE_SEARCH
+            return {
+                ...state, // return a new object with the state
+                messagesSearch: !state.messagesSearch, // set the messagesSearch property to the action payload
+            }
         default: // default case that returns the state
             return state; // return the state
     }
