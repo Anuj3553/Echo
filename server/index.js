@@ -12,6 +12,7 @@ app.use(cors()); // Enable CORS for all requests
 app.use(express.json()); // Parse incoming requests with JSON payloads
 
 app.use('/uploads/images/', express.static('uploads/images')); // Serve the images from the uploads/images directory
+app.use('/uploads/recordings/', express.static('uploads/recordings')); // Serve the recordings from the uploads/recordings directory
 
 app.use('/api/auth', AuthRoutes); // Use the AuthRoutes file for the /api/auth route
 app.use("/api/messages", MessageRoutes); // Use the MessageRoutes file for the /api/messages route

@@ -9,6 +9,8 @@ import { FaMicrophone } from "react-icons/fa";
 import { ImAttachment } from "react-icons/im";
 import { MdSend } from "react-icons/md";
 import PhotoPicker from "../common/PhotoPicker";
+import dynamic from "next/dynamic";
+const CaptureAudio = dynamic(() => import("../common/CaptureAudio"), { ssr: false });
 
 function MessageBar() {
   const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider(); // Destructure userInfo and currentChatProvider from the state
@@ -16,6 +18,7 @@ function MessageBar() {
   const [message, setMessage] = useState(""); // Create a message state variable
   const [showEmojiPicker, setShowEmojiPicker] = useState(false); // Create a showEmojiPicker state variable
   const [grabPhoto, setGrabPhoto] = useState(false); // Create a grabPhoto state variable
+  const [showAudioRecorder, setShowAudioRecorder] = useState(false); // Create a showAudioRecorder state variable
 
   const emojiPicker = useRef(null); // Create a ref for the emoji picker
 
@@ -116,13 +119,13 @@ function MessageBar() {
       if (fileInput) { // Check if the file input element exists
         fileInput.click(); // Click the file input element
       }
-  
+
       const handleFileChange = () => {
         setTimeout(() => setGrabPhoto(false), 1000); // Delay to ensure selection
       };
-  
+
       fileInput?.addEventListener("change", handleFileChange); // Add an event listener for the "change" event
-  
+
       return () => {
         fileInput?.removeEventListener("change", handleFileChange); // Remove the event listener when the component unmounts
       };
@@ -131,55 +134,64 @@ function MessageBar() {
 
   return (
     <div className="bg-panel-header-background h-20 px-4 flex items-center gap-6 relative">
-      <>
-        <div className="flex gap-6">
-          <BsEmojiSmile
-            className="text-panel-header-icon cursor-pointer text-xl"
-            title="Emoji"
-            id="emoji-open"
-            onClick={handleEmojiModal}
-          />
+      {
+        !showAudioRecorder && (
+          <>
+            <div className="flex gap-6">
+              <BsEmojiSmile
+                className="text-panel-header-icon cursor-pointer text-xl"
+                title="Emoji"
+                id="emoji-open"
+                onClick={handleEmojiModal}
+              />
 
-          {/* render the EmojiPicker component */}
-          {showEmojiPicker && ( // If showEmojiPicker is true, render the EmojiPicker component
-            <div
-              ref={emojiPicker}
-              className="absolute bottom-24 left-16 z-40"
-            >
-              <EmojiPicker onEmojiClick={handleEmojiClick} theme="dark" />
+              {/* render the EmojiPicker component */}
+              {showEmojiPicker && ( // If showEmojiPicker is true, render the EmojiPicker component
+                <div
+                  ref={emojiPicker}
+                  className="absolute bottom-24 left-16 z-40"
+                >
+                  <EmojiPicker onEmojiClick={handleEmojiClick} theme="dark" />
+                </div>
+              )}
+
+              <ImAttachment
+                className="text-panel-header-icon cursor-pointer text-xl"
+                title="Attach File"
+                onClick={() => setGrabPhoto(true)}
+              />
             </div>
-          )}
-
-          <ImAttachment
-            className="text-panel-header-icon cursor-pointer text-xl"
-            title="Attach File"
-            onClick={() => setGrabPhoto(true)}
-          />
-        </div>
-        <div className="w-full rounded-lg h-10 items-center">
-          <input
-            type="text"
-            placeholder="Type a message"
-            className="bg-input-background text-sm focus:outline-none text-white h-10 rounded-lg px-5 py-4 w-full"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          />
-        </div>
-        <div className="flex w-10 items-center justify-center">
-          <button>
-            <MdSend
-              className="text-panel-header-icon cursor-pointer text-xl"
-              title="Send message"
-              onClick={sendMessage}
-            />
-            {/* <FaMicrophone
-              className="text-panel-header-icon cursor-pointer text-xl"
-              title="Record"
-            /> */}
-          </button>
-        </div>
-      </>
+            <div className="w-full rounded-lg h-10 items-center">
+              <input
+                type="text"
+                placeholder="Type a message"
+                className="bg-input-background text-sm focus:outline-none text-white h-10 rounded-lg px-5 py-4 w-full"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+            </div>
+            <div className="flex w-10 items-center justify-center">
+              <button>
+                {message.length ?
+                  (
+                    <MdSend
+                      className="text-panel-header-icon cursor-pointer text-xl"
+                      title="Send message"
+                      onClick={sendMessage}
+                    />
+                  ) : (
+                    <FaMicrophone
+                      className="text-panel-header-icon cursor-pointer text-xl"
+                      title="Record"
+                      onClick={() => setShowAudioRecorder(true)}
+                    />
+                  )}
+              </button>
+            </div>
+          </>
+        )}
       {grabPhoto && <PhotoPicker onChange={photoPickerChange} />}
+      {showAudioRecorder && <CaptureAudio hide={setShowAudioRecorder} />}
     </div>
   );
 }

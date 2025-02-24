@@ -132,3 +132,50 @@ export const addImageMessage = async (req, res, next) => {
         );
     }
 }
+
+export const addAudioMessage = async (req, res, next) => {
+    try {
+        if (req.file) { // Check if the file is present in the request
+            const date = Date.now(); // Get the current date and time
+            let fileName = "uploads/recordings/" + date + req.file.originalname; // Create a unique file name
+            renameSync(req.file.path, fileName); // Rename the file with the unique file name
+
+            const prisma = getPrismaInstance(); // Get the Prisma client instance
+            const { from, to } = req.query; // Extract the from and to fields from the query parameters
+
+            if (from && to) { // Check if the from and to fields are present in the query parameters
+                const message = await prisma.messages.create({ // Create a new message in the database
+                    data: { // Set the message data
+                        message: fileName, // Set the message to the file name
+                        sender: { connect: { id: parseInt(from) } }, // Connect the sender to the message
+                        receiver: { connect: { id: parseInt(to) } }, // Connect the receiver to the message
+                        type: "audio", // Set the message type to image
+                    },
+                });
+                return res.status(201).json({ message }); // Return the message in the response
+            }
+            return res.status(400).send("From, To and Message is required."); // Return an error response if the from, to, and message fields are not present
+        }
+
+        return res.status(400).send("Audio is required."); // Return an error response if the image is not present
+    } catch (error) {
+        next(error);
+
+        // Ensure error is a valid object
+        const errorDetails = error instanceof Error ? {
+            message: error.message,
+            stack: error.stack,
+        } : {
+            message: "Unknown error occurred",
+            details: error,
+        };
+
+        console.error("❌ Error submitting application:", errorDetails);
+
+        // Return a valid error response
+        return Response.json(
+            { error: "Internal Server Error", details: errorDetails },
+            { status: 500 }
+        );
+    }
+}
