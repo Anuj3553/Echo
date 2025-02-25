@@ -6,13 +6,13 @@ import { calculateTime } from "@/utils/CalculateTime";
 import MessageStatus from "../common/MessageStatus";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
 
-function ChatLIstItem({ data, isContactPage = false }) {
-  const [{ userInfo, currentChatUser, isContactsPage }, dispatch] = useStateProvider(); // get the userInfo and currentChatUser from the state
+function ChatLIstItem({ data, isContactsPage = false }) {
+  const [{ userInfo, currentChatUser }, dispatch] = useStateProvider(); // get the userInfo and currentChatUser from the state
 
   // create a function called handleContactClick that checks if the currentChatUser is the same as the data
   const handleContactClick = () => {
     // if (currentChatUser?._id === data?._id) { // check if the currentChatUser is the same as the data
-    if (!isContactPage) {
+    if (!isContactsPage) {
       dispatch({ // dispatch an action to change the contactsPage
         type: reducerCases.CHANGE_CURRENT_CHAT_USER, // set the action type to SET_ALL_CONTACTS_PAGE
         user: {

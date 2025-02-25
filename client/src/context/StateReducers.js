@@ -11,6 +11,7 @@ export const initialState = {
     messagesSearch: false, // set the messagesSearch property to false
     userContacts: [], // set the userContacts property to an empty array
     onlineUsers: [], // set the onlineUsers property to an empty array
+    contactSearch: "", // set the contactSearch property to an empty string
     filteredContacts: [], // set the messages property to an empty array
     videoCall: undefined, // set the videoCall property to undefined
     voiceCall: undefined, // set the voiceCall property to undefined
@@ -70,6 +71,15 @@ const reducer = (state, action) => {
             return {
                 ...state, // return a new object with the state
                 onlineUsers: action.onlineUsers, // set the onlineUsers property to the action payload
+            };
+        case reducerCases.SET_CONTACT_SEARCH: // check if the action type is SET_CONTACT_SEARCH
+            const filteredContacts = state.userContacts.filter((contact) =>
+                contact.name.toLowerCase().includes(action.contactSearch?.toLowerCase()
+                )); // filter the userContacts based on the search term
+            return {
+                ...state, // return a new object with the state
+                contactSearch: action.contactSearch, // set the contactSearch property to the action payload
+                filteredContacts, // set the filteredContacts property to the filtered contacts
             };
         default: // default case that returns the state
             return state; // return the state

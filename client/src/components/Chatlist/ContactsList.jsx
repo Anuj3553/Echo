@@ -8,7 +8,23 @@ import ChatLIstItem from "./ChatLIstItem";
 
 function ContactsList() {
   const [allContacts, setAllContacts] = useState([]); // Define the allContacts variable
+  const [searchTerm, setSearchTerm] = useState(""); // Define the searchTerm variable
+  const [searchContacts, setSearchContacts] = useState([]); // Define the searchContacts variable
   const [{ }, dispatch] = useStateProvider(); // Define the dispatch variable
+
+  useEffect(() => {
+    if (searchTerm.length) { // Check if the searchTerm length is greater than 0
+      const filteredData = {}; // Define the filteredData variable
+      // Loop through the allContacts object
+      Object.keys(allContacts).forEach((key) => {
+        // Filter the data based on the search term
+        filteredData[key] = allContacts[key].filter((obj) => obj.name.toLowerCase().includes(searchTerm.toLowerCase()));
+      })
+      setSearchContacts(filteredData); // Set the searchContacts variable to the filteredData variable
+    } else {
+      setSearchContacts(allContacts); // Set the searchContacts variable to the allContacts variable
+    }
+  }, [searchTerm]); // Add the searchTerm as a dependency
 
   // Define the getContacts function
   useEffect(() => {
@@ -17,13 +33,14 @@ function ContactsList() {
         // Define the getContacts function
         const { data: { users }, } = await axios.get(GET_ALL_CONTACTS); // Define the data variable
         setAllContacts(users); // Set the allContacts variable to the users variable
+        setSearchContacts(users); // Set the searchContacts variable to the users variable
       } catch (error) {
         console.log(error); // Log the error
       }
     };
 
     getContacts(); // Call the getContacts function
-  }, []);
+  }, []); // Add an empty dependency array
 
   return (
     <div className="h-full flex flex-col">
@@ -47,12 +64,15 @@ function ContactsList() {
                 type="text"
                 placeholder="Search Contacts"
                 className="bg-transparent text-sm focus:outline-none text-white w-full"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
         </div>
-        {Object.entries(allContacts).map(([initialLetter, userList]) => {
+        {Object.entries(searchContacts).map(([initialLetter, userList]) => {
           return (
+            userList.length > 0 &&
             <div key={Date.now() + initialLetter}>
               <div className="text-teal-light pl-10 py-5">{initialLetter}</div>
               {
@@ -60,7 +80,7 @@ function ContactsList() {
                   return (
                     <ChatLIstItem
                       data={contact}
-                      isContactPage={true}
+                      isContactsPage={true}
                       key={contact.id}
                     />
                   )
