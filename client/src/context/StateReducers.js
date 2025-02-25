@@ -8,8 +8,15 @@ export const initialState = {
     currentChatUser: undefined, // set the currentChatUser property to undefined
     messages: [], // set the messages property to an empty array
     socket: undefined, // set the socket property to undefined
-    messagesSearch: false // set the messagesSearch property to false
-}
+    messagesSearch: false, // set the messagesSearch property to false
+    userContacts: [], // set the userContacts property to an empty array
+    onlineUsers: [], // set the onlineUsers property to an empty array
+    filteredContacts: [], // set the messages property to an empty array
+    videoCall: undefined, // set the videoCall property to undefined
+    voiceCall: undefined, // set the voiceCall property to undefined
+    incomingVoiceCall: undefined, // set the incomingVoiceCall property to undefined
+    incomingVideoCall: undefined, // set the incomingVideoCall property to undefined
+};
 
 // create a new function called reducer that takes in state and action as arguments
 const reducer = (state, action) => {
