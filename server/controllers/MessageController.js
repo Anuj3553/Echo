@@ -179,3 +179,105 @@ export const addAudioMessage = async (req, res, next) => {
         );
     }
 }
+
+export const getInitialContactswithMessages = async (req, res, next) => {
+    try {
+        const userId = parseInt(req.params.from); // Extract the userId from the request parameters
+        const prisma = getPrismaInstance(); // Get the Prisma client instance
+        const user = await prisma.user.findUnique({ // Find the user by their id
+            where: { id: userId }, // Filter the user based on their id
+            include: { // Include the sent and received messages in the response
+                sentMessages: { // Include the sent messages
+                    include: {
+                        receiver: true, // Include the receiver of the message
+                        sender: true, // Include the sender of the message
+                    },
+                    orderBy: { // Order the messages by their creation date
+                        createdAt: "desc", // Order the messages by their creation date in descending order
+                    },
+                },
+                receivedMessages: { // Include the received messages
+                    include: { // Include the sender of the message
+                        receiver: true, // Include the receiver of the message
+                        sender: true, // Include the sender of the message
+                    },
+                    orderBy: { // Order the messages by their creation date
+                        createdAt: "desc", // Order the messages by their creation date in descending order
+                    },
+                }
+            }
+        });
+
+        const messages = [...user.sentMessages, ...user.receivedMessages]; // Combine the sent and received messages into a single array
+        messages.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()); // Sort the messages in descending order based on their creation date
+        const users = new Map(); // Create a new Map to store the users
+        const messageStatusChange = []; // Create an array to store the message status changes
+        messages.forEach((msg) => { // Iterate over the messages array
+            const isSender = msg.senderId === userId; // Check if the current user is the sender of the message
+            const calculatedId = isSender ? msg.receiverId : msg.senderId; // Calculate the id of the other user
+            if (msg.messageStatus === "sent") { // Check if the message status is sent
+                messageStatusChange.push(msg.id); // Add the message to the messageStatusChange array
+            }
+
+            // Extract the id, type, message, messageStatus, createdAt, senderId, and receiverId fields from the message
+            const {
+                id,
+                type,
+                message,
+                messageStatus,
+                createdAt,
+                senderId,
+                receiverId,
+            } = msg;
+
+            if (!users.get(calculatedId)) { // Check if the user is not present in the users Map
+                let user = { // Create a new user object
+                    messageId: id, // Set the message id
+                    type, // Set the message type
+                    message, // Set the message
+                    messageStatus, // Set the message status
+                    createdAt, // Set the message creation date
+                    senderId, // Set the sender id
+                    receiverId, // Set the receiver id
+                };
+
+                if (isSender) { // Check if the current user is the sender of the message
+                    user = { // Update the user object
+                        ...user, // Spread the existing user object
+                        ...msg.receiver, // Spread the receiver object
+                        totalUnreadMessages: 0, // Set the totalUnreadMessages to 0
+                    };
+                } else {
+                    user = { // Update the user object
+                        ...user, // Spread the existing user object
+                        ...msg.sender, // Spread the sender object
+                        totalUnreadMessages: messageStatus !== "read" ? 1 : 0, // Set the totalUnreadMessages to 1 if the message status is not read
+                    };
+                }
+                users.set(calculatedId, { ...user }); // Add the user to the users Map
+            } else if (messageStatus !== "read" && !isSender) { // Check if the message status is not read and the current user is not the sender
+                const user = users.get(calculatedId); // Get the user from the users Map
+                users.set(calculatedId, { // Update the user object
+                    ...user, // Spread the existing user object
+                    totalUnreadMessages: user.totalUnreadMessages + 1, // Increment the totalUnreadMessages by 1
+                });
+            }
+        })
+
+        if (messageStatusChange.length) {
+            await prisma.messages.updateMany({ // Update the message status for all unread messages
+                where: { // Filter the messages based on their ids
+                    id: { in: messageStatusChange } // Check if the message id is in the unreadMessages array
+                },
+                data: { messageStatus: "delivered" }, // Update the message status to read
+            });
+        }
+
+        res.status(200).json({
+            users: Array.from(users.values()), // Convert the users Map to an array
+            onlineUsers: Array.from(onlineUsers.keys()), // Convert the onlineUsers Map to an array
+        });
+    } catch (err) { // Catch any errors that occur
+        next(err); // Pass the error to the error handling middleware
+    }
+}

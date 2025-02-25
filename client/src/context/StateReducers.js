@@ -61,6 +61,16 @@ const reducer = (state, action) => {
                 ...state, // return a new object with the state
                 messagesSearch: !state.messagesSearch, // set the messagesSearch property to the action payload
             }
+        case reducerCases.SET_USER_CONTACTS: // check if the action type is SET_USER_CONTACTS
+            return {
+                ...state, // return a new object with the state
+                userContacts: action.userContacts, // set the userContacts property to the action payload
+            };
+        case reducerCases.SET_ONLINE_USERS: // check if the action type is SET_ONLINE_USERS
+            return {
+                ...state, // return a new object with the state
+                onlineUsers: action.onlineUsers, // set the onlineUsers property to the action payload
+            };
         default: // default case that returns the state
             return state; // return the state
     }
