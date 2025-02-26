@@ -115,6 +115,13 @@ function Main() {
         })
       });
 
+      socket.current.on("online-users", ({ onlineUsers }) => { // listen for the "online-users" event
+        dispatch({ // dispatch an action to set the online users
+          type: reducerCases.SET_ONLINE_USERS, // set the online users
+          onlineUsers, // set the online users
+        })
+      });
+
       setSocketEvent(true); // set the socketEvent to true
     }
   }, [socket.current])

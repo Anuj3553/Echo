@@ -39,7 +39,17 @@ io.on('connection', (socket) => { // connection: This event is triggered when a 
     global.chatSocket = socket; // Store the socket object in the global object so that it can be accessed from other parts of the application.
     socket.on("add-user", (userId) => { // add-user: This event is triggered when a new user connects to the socket.io server.
         onlineUsers.set(userId, socket.id); // Add the user to the onlineUsers map with the user's ID as the key and the socket ID as the value.
+        socket.broadcast.emit("online-users", { // Emit an "online-users" event to all connected clients with the updated list of online users.
+            onlineUsers: Array.from(onlineUsers.keys()), // Convert the onlineUsers map to an array of user IDs.
+        });
     });
+
+    socket.on("signout", (id) => { // signout: This event is triggered when a user signs out of the application.
+        onlineUsers.delete(id); // Remove the user from the onlineUsers map.
+        socket.broadcast.emit("online-users", { // Emit an "online-users" event to all connected clients with the updated list of online users.
+            onlineUsers: Array.from(onlineUsers.keys()), // Convert the onlineUsers map to an array of user IDs.
+        })
+    })
 
     socket.on("send-msg", (data) => { // send-msg: This event is triggered when a user sends a message to another user.
         const sendUserSocket = onlineUsers.get(data.to); // Get the socket ID of the user to whom the message is being sent.
