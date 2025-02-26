@@ -13,6 +13,8 @@ import { io } from "socket.io-client";
 import SearchMessages from "./Chat/SearchMessages";
 import VideoCall from "./Call/VideoCall";
 import VoiceCall from "./Call/VoiceCall";
+import IncomingVideoCall from "./common/IncomingVideoCall";
+import IncomingVoiceCall from "./common/IncomingVoiceCall";
 
 function Main() {
   const router = useRouter();
@@ -75,29 +77,73 @@ function Main() {
           type: reducerCases.ADD_MESSAGE, // set the action type
           newMessage: {
             ...data.message // set the new message
+          },
+        })
+      });
+
+      socket.current.on("incoming-voice-call", ({ from, roomId, callType }) => { // listen for the "incoming-voice-call" event
+        dispatch({
+          type: reducerCases.SET_INCOMING_VOICE_CALL, // set the incoming voice call
+          incomingVoiceCall: {
+            ...from, // set the incoming voice call
+            roomId, // set the room ID
+            callType, // set the call type
           }
         })
       });
+
+      socket.current.on("incoming-video-call", ({ from, roomId, callType }) => { // listen for the "incoming-video-call" event
+        dispatch({
+          type: reducerCases.SET_INCOMING_VIDEO_CALL, // set the incoming video call
+          incomingVideoCall: {
+            ...from, // set the incoming video call
+            roomId, // set the room ID
+            callType, // set the call type
+          }
+        })
+      });
+
+      socket.current.on("voice-call-rejected", () => { // listen for the "voice-call-rejected" event
+        dispatch({ // dispatch an action to set the incoming voice call
+          type: reducerCases.END_CALL, // set the incoming voice call
+        })
+      });
+
+      socket.current.on("video-call-rejected", () => { // listen for the "video-call-rejected" event
+        dispatch({ // dispatch an action to set the incoming video call
+          type: reducerCases.END_CALL, // set the incoming video call
+        })
+      });
+
       setSocketEvent(true); // set the socketEvent to true
     }
   }, [socket.current])
 
   useEffect(() => {
+    // Function to get messages
     const getMessages = async () => {
       const { data: { messages } } = await axios.get(`${GET_MESSAGES_ROUTE}/${userInfo?.id}/${currentChatUser?.id}`);
       dispatch({
-        type: reducerCases.SET_MESSAGES,
-        messages,
+        type: reducerCases.SET_MESSAGES, // set the messages
+        messages, // set the messages
       });
     }
 
-    if (currentChatUser?.id) {
-      getMessages();
+    if (currentChatUser?.id) { // if the currentChatUser ID is not null
+      getMessages(); // call the getMessages function
     }
-  }, [currentChatUser])
+  }, [currentChatUser]); // run this effect when currentChatUser changes
 
   return (
     <>
+      {incomingVideoCall && (
+        <IncomingVideoCall />
+      )}
+
+      {incomingVoiceCall && (
+        <IncomingVoiceCall />
+      )}
+
       {videoCall && (
         <div className="h-screen w-screen max-h-full overflow-hidden">
           <VideoCall />

@@ -7,8 +7,6 @@ import ChatLIstItem from "./ChatLIstItem";
 
 function List() {
   const [{ userInfo, userContacts, filteredContacts }, dispatch] = useStateProvider(); // get the userInfo from the state
-  console.log("filteredContacts", filteredContacts);
-  console.log("userContacts", userContacts);
 
   useEffect(() => {
     const getContacts = async () => {

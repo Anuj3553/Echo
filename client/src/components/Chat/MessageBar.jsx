@@ -38,7 +38,6 @@ function MessageBar() {
           to: currentChatUser?.id, // Set the to field to the current chat user id
         },
       });
-      console.log("response", response); // Log the response to the console
       if (response.status === 201) {
         socket.current.emit("send-msg", { // Emit a "send-msg" event to the server with the message data
           to: currentChatUser?.id, // Send the message to the current chat user

@@ -6,7 +6,6 @@ import { reducerCases } from "@/context/constants";
 
 function ChatListHeader() {
   const [{ userInfo }, dispatch] = useStateProvider();
-  console.log("userInfo", userInfo);
 
   const handleAllContactsPage = () => {
     dispatch({

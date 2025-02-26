@@ -40,6 +40,7 @@ io.on('connection', (socket) => { // connection: This event is triggered when a 
     socket.on("add-user", (userId) => { // add-user: This event is triggered when a new user connects to the socket.io server.
         onlineUsers.set(userId, socket.id); // Add the user to the onlineUsers map with the user's ID as the key and the socket ID as the value.
     });
+
     socket.on("send-msg", (data) => { // send-msg: This event is triggered when a user sends a message to another user.
         const sendUserSocket = onlineUsers.get(data.to); // Get the socket ID of the user to whom the message is being sent.
         if (sendUserSocket) { // Check if the user is online.
@@ -48,5 +49,46 @@ io.on('connection', (socket) => { // connection: This event is triggered when a 
                 message: data.message, // Send the message data
             });
         }
+    });
+
+    socket.on("outgoing-voice-call", (data) => { // outoging-voice-call: This event is triggered when a user initiates a voice call.
+        const sendUserSocket = onlineUsers.get(data.to); // Get the socket ID of the user to whom the call is being made.
+        if (sendUserSocket) { // Check if the user is online.
+            socket.to(sendUserSocket).emit("incoming-voice-call", { // Emit an "incoming-voice-call" event to the user's socket with the call data.
+                from: data.from, // Send the call from the user
+                roomId: data.roomId, // Send the room ID
+                callType: data.callType, // Send the call type
+            });
+        }
+    });
+
+    socket.on("outgoing-video-call", (data) => { // outgoing-video-call: This event is triggered when a user initiates a video call.
+        const sendUserSocket = onlineUsers.get(data.to); // Get the socket ID of the user to whom the call is being made.
+        if (sendUserSocket) { // Check if the user is online.
+            socket.to(sendUserSocket).emit("incoming-video-call", { // Emit an "incoming-video-call" event to the user's socket with the call data.
+                from: data.from, // Send the call from the user
+                roomId: data.roomId, // Send the room ID
+                callType: data.callType, // Send the call type
+            });
+        }
+    });
+
+    socket.on("reject-voice-call", (data) => { // reject-voice-call: This event is triggered when a user rejects a voice call.
+        const sendUserSocket = onlineUsers.get(data.from); // Get the socket ID of the user who initiated the call.
+        if (sendUserSocket) { // Check if the user is online.
+            socket.to(sendUserSocket).emit("voice-call-rejected"); // Emit a "voice-call-rejected" event to the user's socket.
+        }
+    });
+
+    socket.on("reject-video-call", (data) => { // reject-video-call: This event is triggered when a user rejects a video call.
+        const sendUserSocket = onlineUsers.get(data.from); // Get the socket ID of the user who initiated the call.
+        if (sendUserSocket) { // Check if the user is online.
+            socket.to(sendUserSocket).emit("video-call-rejected"); // Emit a "video-call-rejected" event to the user's socket.
+        }
+    });
+
+    socket.on("accept-incoming-call", (data) => { // accept-incoming-call: This event is triggered when a user accepts a voice call.
+        const sendUserSocket = onlineUsers.get(id); // Get the socket ID of the user who initiated the call.
+        socket.to(sendUserSocket).emit("accept-call"); // Emit an "accept-call" event to the user's socket.
     });
 });
