@@ -1,16 +1,39 @@
+import { reducerCases } from "@/context/constants";
 import { useStateProvider } from "@/context/StateContext";
 import Image from "next/image";
 import React from "react";
 
 function IncomingVoiceCall() {
-  const [{ incomingVoiceCall }, dispatch] = useStateProvider();
+  const [{ incomingVoiceCall, socket }, dispatch] = useStateProvider();
 
   const acceptCall = () => {
-    
+    // set the voice call to the incoming voice call
+    dispatch({
+      type: reducerCases.SET_VOICE_CALL, // set the voice call
+      voiceCall: {
+        ...incomingVoiceCall, // set the incoming voice call
+        type: "in-coming", // set the type to "in-coming"
+      },
+    });
+
+    // accept-incoming-call event: emit an event to accept the incoming call
+    socket.current.emit("accept-incoming-call", { id: incomingVoiceCall.id });
+
+    // dispatch an action to set the incoming voice call
+    dispatch({
+      type: reducerCases.SET_INCOMING_VOICE_CALL, // set the incoming voice call
+      incomingVoiceCall: undefined, // set the incoming voice call
+    });
   }
 
   const rejectCall = () => {
+    // reject-incoming-call event: emit an event to reject the incoming call
+    socket.current.emit("reject-voice-call", { from: incomingVoiceCall.id });
 
+    // dispatch an action to set the incoming voice call
+    dispatch({
+      type: reducerCases.END_CALL, // set the incoming voice call
+    });
   }
 
   return (
@@ -28,17 +51,17 @@ function IncomingVoiceCall() {
         <div className="text-xs">{incomingVoiceCall.name}</div>
         <div className="flex gap-2 mt-2">
           <button
-            onClick={rejectCall}
-            className="bg-red-500 p-1 px-3 text-sm rounded-full"
-          >
-            Reject
-          </button>
-
-          <button
             onClick={acceptCall}
             className="bg-green-500 p-1 px-3 text-sm rounded-full"
           >
             Accept
+          </button>
+
+          <button
+            onClick={rejectCall}
+            className="bg-red-500 p-1 px-3 text-sm rounded-full"
+          >
+            Reject
           </button>
         </div>
       </div>
