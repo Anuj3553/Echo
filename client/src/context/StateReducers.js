@@ -109,6 +109,11 @@ const reducer = (state, action) => {
                 incomingVideoCall: undefined, // set the incomingVideoCall property to undefined
                 incomingVoiceCall: undefined, // set the incomingVoiceCall property to undefined
             };
+        case reducerCases.SET_EXIT_CHAT: // check if the action type is SET_EXIT_CHAT
+            return {
+                ...state, // return a new object with the state
+                currentChatUser: undefined, // set the currentChatUser property to undefined
+            }
         default: // default case that returns the state
             return state; // return the state
     }

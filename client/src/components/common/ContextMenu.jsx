@@ -38,7 +38,7 @@ function ContextMenu({ options, cordinates, contextMenu, setContextMenu }) {
           <li
             key={name} // Set the key to the name of the option
             onClick={(e) => handleClick(e, callback)} // Add an onClick event listener to the option
-            className="px-5 py-2 cursor-pointer hover:bg-background-default-hover"
+            className="px-5 py-2 cursor-pointer hover:bg-background-default-hover z-50"
           >
             <span className="text-white">{name}</span>
           </li>

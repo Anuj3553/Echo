@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "../common/Avatar";
 import { MdCall } from "react-icons/md"
 import { IoVideocam } from "react-icons/io5"
@@ -6,9 +6,32 @@ import { BiSearchAlt2 } from "react-icons/bi"
 import { BsThreeDotsVertical } from "react-icons/bs"
 import { useStateProvider } from "@/context/StateContext";
 import { reducerCases } from "@/context/constants";
+import ContextMenu from "../common/ContextMenu";
 
 function ChatHeader() {
   const [{ currentChatUser }, dispatch] = useStateProvider(); // get the currentChatUser from the global state
+
+  const [contextMenuCordinates, setContextMenuCordinates] = useState({
+    x: 0,
+    y: 0
+  });
+  const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
+
+  const showContextMenu = (e) => {
+    e.preventDefault();
+    setContextMenuCordinates({ x: e.pageX - 50, y: e.pageY + 20 });
+    setIsContextMenuVisible(true);
+  };
+
+  const contextMenuOptions = [
+    {
+      name: "Exit",
+      callback: async () => {
+        setIsContextMenuVisible(false);
+        dispatch({ type: reducerCases.SET_EXIT_CHAT });
+      },
+    },
+  ];
 
   const handleVoiceCall = () => {
     dispatch({
@@ -56,8 +79,18 @@ function ChatHeader() {
         onClick={() => dispatch({ type: reducerCases.SET_MESSAGE_SEARCH })}
       />
       <BsThreeDotsVertical
+        id="context-opener"
+        onClick={(e) => showContextMenu(e)}
         className="text-panel-header-icon cursor-pointer text-xl"
       />
+      {isContextMenuVisible && (
+        <ContextMenu
+          options={contextMenuOptions}
+          cordinates={contextMenuCordinates}
+          contextMenu={isContextMenuVisible}
+          setContextMenu={setIsContextMenuVisible}
+        />
+      )}
     </div>
   </div>;
 }
