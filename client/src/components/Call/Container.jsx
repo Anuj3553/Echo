@@ -9,7 +9,8 @@ function Container({ data }) {
   const [callAccepted, setCallAccepted] = useState(false);
 
   const endCall = () => {
-    const id = data.id;
+    const id = data?.id;
+    console.log("end call", data);
     if (data.callType === "voice") {
       socket.current.emit("reject-voice-call", {
         from: id,

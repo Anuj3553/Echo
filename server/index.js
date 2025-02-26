@@ -88,7 +88,7 @@ io.on('connection', (socket) => { // connection: This event is triggered when a 
     });
 
     socket.on("accept-incoming-call", (data) => { // accept-incoming-call: This event is triggered when a user accepts a voice call.
-        const sendUserSocket = onlineUsers.get(id); // Get the socket ID of the user who initiated the call.
+        const sendUserSocket = onlineUsers.get(data.id); // Get the socket ID of the user who initiated the call.
         socket.to(sendUserSocket).emit("accept-call"); // Emit an "accept-call" event to the user's socket.
     });
 });
