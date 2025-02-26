@@ -23,7 +23,7 @@ function login() {
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider(); // create a new GoogleAuthProvider object
     const {
-      user: { displayName: name, email, photoURL: profileImage },
+      user: { displayName: name, email, photoURL: profilePicture },
     } = await signInWithPopup(firebaseAuth, provider); // sign in with Google and get the user's name, email, and profile image
     try {
       if (email) { // check if the email exists
@@ -40,13 +40,13 @@ function login() {
             userInfo: {
               name, // set the name property to the user's name
               email, // set the email property to the user's email
-              profileImage, // set the profileImage property to the user's profile image
+              profilePicture, // set the profilePicture property to the user's profile image
               status: "" // set the status property to an empty string
             },
           });
           router.push("/onboarding");
         } else {
-          const { id, name, email, profilePicture: profileImage, status } = data.data // destructure the id, name, email, profilePicture, and status from the data.data object
+          const { id, name, email, profilePicture: profilePicture, status } = data.data // destructure the id, name, email, profilePicture, and status from the data.data object
 
           dispatch({ // dispatch an action to set the user info
             type: reducerCases.SET_USER_INFO, // set the action type to SET_USER_INFO
@@ -54,7 +54,7 @@ function login() {
               id, // set the id property to the user's id
               name, // set the name property to the user's name
               email, // set the email property to the user's email
-              profileImage, // set the profileImage property to the user's profile image
+              profilePicture, // set the profilePicture property to the user's profile image
               status // set the status property to the user's status
             },
           });

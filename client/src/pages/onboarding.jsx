@@ -14,7 +14,7 @@ function onboarding() {
   const [{ userInfo, newUser }, dispatch] = useStateProvider();
   const [name, setName] = useState(userInfo?.name || "");
   const [about, setAbout] = useState("");
-  const [image, setImage] = useState(userInfo?.profileImage ||"/default_avatar.png");
+  const [image, setImage] = useState(userInfo?.profilePicture ||"/default_avatar.png");
 
   // Check if the user is already onboarded
   useEffect(() => {
@@ -50,7 +50,7 @@ function onboarding() {
               id: data.user.id, // set the id property to the user's id
               name, // set the name property to the user's name
               email, // set the email property to the user's email
-              profileImage: image, // set the profileImage property to the user's profile image
+              profilePicture: image, // set the profilePicture property to the user's profile image
               status: "" // set the status property to an empty string
             },
           });

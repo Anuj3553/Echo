@@ -81,6 +81,34 @@ const reducer = (state, action) => {
                 contactSearch: action.contactSearch, // set the contactSearch property to the action payload
                 filteredContacts, // set the filteredContacts property to the filtered contacts
             };
+        case reducerCases.SET_VIDEO_CALL: // check if the action type is SET_VIDEO_CALL
+            return {
+                ...state, // return a new object with the state
+                videoCall: action.videoCall, // set the videoCall property to the action payload
+            };
+        case reducerCases.SET_VOICE_CALL: // check if the action type is SET_VOICE_CALL
+            return {
+                ...state, // return a new object with the state
+                voiceCall: action.voiceCall, // set the voiceCall property to the action payload
+            };
+        case reducerCases.SET_INCOMING_VOICE_CALL: // check if the action type is SET_INCOMING_VOICE_CALL
+            return {
+                ...state, // return a new object with the state
+                incomingVoiceCall: action.incomingVoiceCall, // set the incomingVoiceCall property to the action payload
+            };
+        case reducerCases.SET_INCOMING_VIDEO_CALL: // check if the action type is SET_INCOMING_VIDEO_CALL
+            return {
+                ...state, // return a new object with the state
+                incomingVideoCall: action.incomingVideoCall, // set the incomingVideoCall property to the action payload
+            };
+        case reducerCases.END_CALL: // check if the action type is END_CALL
+            return {
+                ...state, // return a new object with the state
+                voiceCall: undefined, // set the voiceCall property to undefined
+                videoCall: undefined, // set the videoCall property to undefined
+                incomingVideoCall: undefined, // set the incomingVideoCall property to undefined
+                incomingVoiceCall: undefined, // set the incomingVoiceCall property to undefined
+            };
         default: // default case that returns the state
             return state; // return the state
     }

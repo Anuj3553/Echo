@@ -11,11 +11,13 @@ import { reducerCases } from "@/context/constants";
 import Chat from "./Chat/Chat";
 import { io } from "socket.io-client";
 import SearchMessages from "./Chat/SearchMessages";
+import VideoCall from "./Call/VideoCall";
+import VoiceCall from "./Call/VoiceCall";
 
 function Main() {
   const router = useRouter();
 
-  const [{ userInfo, currentChatUser, messagesSearch }, dispatch] = useStateProvider(); // useStateProvider is a custom hook that returns the state and dispatch function from the context
+  const [{ userInfo, currentChatUser, messagesSearch, videoCall, voiceCall, incomingVoiceCall, incomingVideoCall }, dispatch] = useStateProvider(); // useStateProvider is a custom hook that returns the state and dispatch function from the context
 
   const [redirectLogin, setRedirectLogin] = useState(false); // create a state variable to store the redirectLogin state
   const [socketEvent, setSocketEvent] = useState(false); // create a state variable to store the socketEvent state
@@ -40,14 +42,14 @@ function Main() {
       }
 
       if (data?.data) {
-        const { id, name, email, profileImage, status } = data.data; // destructure id, name, email, profileImage, and status from data.data
+        const { id, name, email, profilePicture, status } = data.data; // destructure id, name, email, profilePicture, and status from data.data
         dispatch({
           type: reducerCases.SET_USER_INFO, // set the user info
           userInfo: {
             id, // set the id
             name, // set the name
             email, // set the email
-            profileImage, // set the profile image
+            profilePicture, // set the profile image
             status, // set the status
           },
         });
@@ -95,17 +97,33 @@ function Main() {
   }, [currentChatUser])
 
   return (
-    <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-screen">
-      <ChatList />
-      {currentChatUser ?
-        <div className={messagesSearch ? "grid grid-cols-2" : "grid-cols-2"}>
-          <Chat />
-          {console.log("messagesSearch", messagesSearch)}
-          {messagesSearch && <SearchMessages />}
-        </div> :
-        <Empty />
-      }
-    </div>
+    <>
+      {videoCall && (
+        <div className="h-screen w-screen max-h-full overflow-hidden">
+          <VideoCall />
+        </div>
+      )}
+
+      {voiceCall && (
+        <div className="h-screen w-screen max-h-full overflow-hidden">
+          <VoiceCall />
+        </div>
+      )}
+
+      {!videoCall && !voiceCall && (
+        <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-screen">
+          <ChatList />
+          {currentChatUser ? (
+            <div className={messagesSearch ? "grid grid-cols-2" : "grid-cols-1"}>
+              <Chat />
+              {messagesSearch && <SearchMessages />}
+            </div>
+          ) : (
+            <Empty />
+          )}
+        </div>
+      )}
+    </>
   );
 }
 
