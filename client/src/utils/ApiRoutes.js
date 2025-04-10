@@ -1,4 +1,4 @@
-export const HOST = "http://localhost:3005"; // Define the HOST variable
+export const HOST = process.env.NEXT_PUBLIC_BASE_URL; // Define the HOST variable using environment variable
 
 const AUTH_ROUTE = `${HOST}/api/auth`; // Define the AUTH_ROUTE variable
 const MESSAGE_ROUTE = `${HOST}/api/messages`; // Define the MESSAGE_ROUTE variable
