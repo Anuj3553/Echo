@@ -21,10 +21,15 @@ const server = app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
 })
 
+const allowedOrigins = [process.env.CLIENT_URL || "http://localhost:3000"];
+
 // Create a new instance of the Server class and pass in the server object created by the app.listen() method. This will create a new instance of the socket.io server that will listen for incoming connections on the same port as the Express server.
 const io = new Server(server, {
     cors: { // Configure the CORS settings for the socket.io server to allow requests from the specified origin.
-        origin: "http://localhost:3000", // Allow requests from the specified origin
+        origin: [
+            "https://echo-dun-two.vercel.app", // allow your deployed frontend
+            "http://localhost:3000"            // optionally keep local for development
+        ],
     },
 });
 
