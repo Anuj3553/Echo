@@ -5,13 +5,12 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyDeotltM7h72uiEBG4kkbCkb75rJqymmAI",
-    authDomain: "echo-6fea2.firebaseapp.com",
-    projectId: "echo-6fea2",
-    storageBucket: "echo-6fea2.firebasestorage.app",
-    messagingSenderId: "196995932764",
-    appId: "1:196995932764:web:50965872eeadc2d3ecbc99",
-    measurementId: "G-P14TF0JZRS"
+    apiKey: "AIzaSyDivoj-u5k-3kN8o08fb4jhnzotD9f0_E0",
+    authDomain: "app-echo-chat.firebaseapp.com",
+    projectId: "app-echo-chat",
+    storageBucket: "app-echo-chat.firebasestorage.app",
+    messagingSenderId: "435471819167",
+    appId: "1:435471819167:web:99449ea7bea6a87f131daa"
 };
 
 // Initialize Firebase
